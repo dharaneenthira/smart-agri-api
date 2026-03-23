@@ -1,0 +1,13 @@
+﻿venv/
+venv_ai/
+.venv/
+.venv-*/
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+media/
+data/
+staticfiles/
+*.h5
+*.whl

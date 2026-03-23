@@ -1,0 +1,25 @@
+<div class="bg-white p-4 rounded shadow" id="crop-reco-card">
+  <div class="font-semibold mb-2">Crop Recommendation</div>
+
+  <div class="text-sm text-gray-600 mb-3">
+    Based on Soil Moisture: <b>{{ soil_moisture }}%</b>,
+    Month: <b>{{ month }}</b>,
+    Irrigation: <b>{% if irrigation %}Yes{% else %}No{% endif %}</b>
+  </div>
+
+  <ol class="space-y-2">
+    {% for r in recs %}
+      <li class="border rounded p-3">
+        <div class="flex justify-between">
+          <div class="font-semibold">{{ r.crop }}</div>
+          <div class="text-sm">Score: <b>{{ r.score }}</b></div>
+        </div>
+        <div class="text-sm text-gray-600 mt-1">{{ r.reason }}</div>
+      </li>
+    {% endfor %}
+  </ol>
+
+  <div class="text-xs text-gray-500 mt-3">
+    Note: This is a prototype advisory. Validate with local agriculture officer for final decisions.
+  </div>
+</div>

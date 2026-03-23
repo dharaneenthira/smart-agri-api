@@ -1,0 +1,190 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<div class="flex justify-between items-center mb-4">
+  <div>
+    <h1 class="text-2xl font-bold">{{ farm.name }}</h1>
+    <p class="text-gray-600">{{ farm.location }}</p>
+  </div>
+
+  <div class="flex gap-3">
+    <a class="text-blue-600 underline" href="{% url 'alerts_list' %}">Alerts</a>
+    <a class="text-blue-600 underline" href="{% url 'crop_history' farm.id %}">Crop History</a>
+    <a class="text-blue-600 underline" href="{% url 'dash_home' %}">Back</a>
+  </div>
+</div>
+
+<!-- Top cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+
+  {% include "dashboard/partials/weather_card.html" %}
+  {% include "dashboard/partials/disease_card.html" %}
+  {% include "dashboard/partials/advisory_card.html" %}
+
+  <!-- Crop Recommendation card (HTMX target) -->
+  <div class="bg-white p-4 rounded shadow" id="crop-reco-card">
+    <div class="font-semibold mb-2">Crop Recommendation</div>
+    <div class="text-sm text-gray-600">
+      Enter soil moisture, month and irrigation availability.
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bg-white p-4 rounded shadow">
+    <div class="font-semibold mb-3">Actions</div>
+
+    <!-- Demo Data -->
+    <form action="{% url 'seed_demo_data' farm.id %}" method="post" class="mb-3">
+      {% csrf_token %}
+      <button class="bg-gray-800 text-white px-3 py-2 rounded w-full">
+        Add Demo Data
+      </button>
+    </form>
+
+    <!-- Fetch Weather -->
+    <form
+      hx-post="{% url 'fetch_weather' farm.id %}"
+      hx-target="#weather-card"
+      hx-swap="outerHTML"
+      class="mb-3"
+    >
+      {% csrf_token %}
+      <button class="bg-blue-600 text-white px-3 py-2 rounded w-full">
+        Fetch Weather
+      </button>
+    </form>
+
+    <!-- Predict Disease -->
+    <form
+      hx-post="{% url 'predict_disease' farm.id %}"
+      hx-target="#disease-card"
+      hx-swap="outerHTML"
+      enctype="multipart/form-data"
+      class="mb-3"
+    >
+      {% csrf_token %}
+      <input type="file" name="image" class="mb-2 w-full" required>
+      <button class="bg-green-600 text-white px-3 py-2 rounded w-full">
+        Scan Disease
+      </button>
+    </form>
+
+    <!-- Generate Advisory -->
+    <form
+      hx-post="{% url 'refresh_advisory' farm.id %}"
+      hx-target="#advisory-card"
+      hx-swap="outerHTML"
+      class="mb-3"
+    >
+      {% csrf_token %}
+      <button class="bg-purple-600 text-white px-3 py-2 rounded w-full">
+        Generate Advisory
+      </button>
+    </form>
+
+    <!-- Export -->
+    <div class="flex gap-2 mb-4">
+      <a href="{% url 'export_csv' farm.id %}"
+         class="bg-yellow-500 text-white px-3 py-2 rounded text-center w-full text-sm">
+        Export CSV
+      </a>
+      <a href="{% url 'export_pdf' farm.id %}"
+         class="bg-red-500 text-white px-3 py-2 rounded text-center w-full text-sm">
+        Export PDF
+      </a>
+    </div>
+
+    <!-- Crop Recommend Form -->
+    <form
+      hx-post="{% url 'crop_recommend' farm.id %}"
+      hx-target="#crop-reco-card"
+      hx-swap="outerHTML"
+    >
+      {% csrf_token %}
+
+      <label class="text-sm">Soil moisture (%)</label>
+      <input type="number" step="0.1" name="soil_moisture"
+             class="border p-2 rounded w-full mb-2" required>
+
+      <label class="text-sm">Month (1-12)</label>
+      <input type="number" name="month" min="1" max="12"
+             class="border p-2 rounded w-full mb-2" required>
+
+      <label class="text-sm">Irrigation available?</label>
+      <select name="irrigation" class="border p-2 rounded w-full mb-3">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+      </select>
+
+      <button class="bg-indigo-600 text-white px-3 py-2 rounded w-full">
+        Recommend Crops
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<!-- Soil chart -->
+<div class="bg-white p-4 rounded shadow mb-4">
+  <div class="font-semibold mb-2">Soil Moisture Trend</div>
+  <canvas id="soilChart"></canvas>
+  <div class="text-xs text-gray-500 mt-2">
+    Add sensor readings via <code>/api/sensor-readings/</code> (type: <code>soil_moisture</code>) to populate chart.
+  </div>
+</div>
+
+<!-- Map -->
+<div class="bg-white p-4 rounded shadow">
+  <div class="font-semibold mb-2">Farm Location</div>
+
+  <div id="map"
+       data-lat="{{ farm.latitude|default_if_none:'0' }}"
+       data-lon="{{ farm.longitude|default_if_none:'0' }}"
+       data-name="{{ farm.name|escapejs }}"
+       style="height: 260px;">
+  </div>
+</div>
+
+<script>
+  // Chart.js
+  const labels = {{ soil_labels_json|safe }};
+  const values = {{ soil_values_json|safe }};
+
+  const ctx = document.getElementById("soilChart");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Soil Moisture",
+        data: values,
+        borderWidth: 2,
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  // Leaflet map
+  const mapEl = document.getElementById("map");
+  const lat = parseFloat(mapEl.dataset.lat || "0");
+  const lon = parseFloat(mapEl.dataset.lon || "0");
+  const farmName = mapEl.dataset.name || "Farm";
+
+  const zoom = (lat !== 0 && lon !== 0) ? 12 : 2;
+  const map = L.map("map").setView([lat, lon], zoom);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(map);
+
+  if (lat !== 0 && lon !== 0) {
+    L.marker([lat, lon]).addTo(map).bindPopup(farmName);
+  }
+</script>
+
+{% endblock %}

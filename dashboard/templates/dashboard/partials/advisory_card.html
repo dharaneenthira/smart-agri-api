@@ -1,0 +1,20 @@
+<div class="bg-white p-4 rounded shadow" id="advisory-card">
+  <div class="font-semibold mb-2">Advisory & Risk</div>
+
+  <div class="text-sm mb-2">
+    Risk Score: <b>{{ risk }}/100</b>
+    <span class="
+      {% if severity == 'high' %}text-red-600
+      {% elif severity == 'medium' %}text-orange-600
+      {% else %}text-green-600{% endif %}
+    ">
+      ({{ severity|title }})
+    </span>
+  </div>
+
+  <ul class="text-sm list-disc ml-5 space-y-1">
+    {% for a in advisories %}
+      <li>{{ a }}</li>
+    {% endfor %}
+  </ul>
+</div>

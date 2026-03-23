@@ -1,0 +1,41 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-bold">Alerts</h1>
+  <a class="text-blue-600 underline" href="{% url 'dash_home' %}">Back</a>
+</div>
+
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="text-left p-3">Time</th>
+        <th class="text-left p-3">Farm</th>
+        <th class="text-left p-3">Severity</th>
+        <th class="text-left p-3">Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in alerts %}
+      <tr class="border-t">
+        <td class="p-3">{{ a.created_at }}</td>
+        <td class="p-3">{{ a.farm.name }}</td>
+        <td class="p-3">
+          <span class="{% if a.severity == 'high' %}text-red-600{% elif a.severity == 'medium' %}text-orange-600{% else %}text-green-600{% endif %}">
+            {{ a.severity|title }}
+          </span>
+        </td>
+        <td class="p-3">
+          <div class="font-semibold">{{ a.title }}</div>
+          <pre class="text-xs text-gray-600 whitespace-pre-wrap">{{ a.message }}</pre>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td class="p-3" colspan="4">No alerts yet. Open a farm and click “Generate Advisory”.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

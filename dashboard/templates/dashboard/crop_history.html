@@ -1,0 +1,39 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<div class="flex justify-between items-center mb-4">
+  <div>
+    <h1 class="text-2xl font-bold">Crop Recommendation History</h1>
+    <p class="text-gray-600">{{ farm.name }}</p>
+  </div>
+  <a class="text-blue-600 underline" href="{% url 'farm_detail' farm.id %}">Back</a>
+</div>
+
+<div class="bg-white rounded shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="text-left p-3">Time</th>
+        <th class="text-left p-3">Soil Moisture</th>
+        <th class="text-left p-3">Month</th>
+        <th class="text-left p-3">Irrigation</th>
+        <th class="text-left p-3">Top Crop</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in items %}
+      <tr class="border-t">
+        <td class="p-3">{{ x.created_at }}</td>
+        <td class="p-3">{{ x.soil_moisture }}%</td>
+        <td class="p-3">{{ x.month }}</td>
+        <td class="p-3">{% if x.irrigation %}Yes{% else %}No{% endif %}</td>
+        <td class="p-3 font-semibold">{{ x.top_crop }}</td>
+      </tr>
+      {% empty %}
+      <tr><td class="p-3" colspan="5">No history yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

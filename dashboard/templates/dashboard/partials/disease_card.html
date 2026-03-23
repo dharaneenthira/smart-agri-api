@@ -1,0 +1,46 @@
+<div class="bg-white p-4 rounded shadow" id="disease-card">
+  <div class="font-semibold mb-2">Disease Scan</div>
+
+  {% if latest_disease %}
+    <div class="text-sm">Label: <b>{{ latest_disease.predicted_label }}</b></div>
+    <div class="text-sm">Confidence: <b>{{ latest_disease.confidence }}</b></div>
+
+    {% if treatment %}
+      <div class="mt-3">
+        {% if treatment.crop %}
+          <div class="text-sm text-gray-600">Crop: <b>{{ treatment.crop }}</b></div>
+        {% endif %}
+        {% if treatment.disease %}
+          <div class="text-sm text-gray-600">Disease: <b>{{ treatment.disease }}</b></div>
+        {% endif %}
+
+        <div class="mt-3 text-sm font-semibold">Immediate Actions</div>
+        <ul class="text-sm list-disc ml-5 mt-1 space-y-1">
+          {% for a in treatment.immediate_actions %}
+            <li>{{ a }}</li>
+          {% endfor %}
+        </ul>
+
+        {% if treatment.chemical_options %}
+          <div class="mt-3 text-sm font-semibold">Medicine / Spray (Active Ingredient)</div>
+          <ul class="text-sm list-disc ml-5 mt-1 space-y-1">
+            {% for c in treatment.chemical_options %}
+              <li><b>{{ c.active_ingredient }}</b> — {{ c.note }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if treatment.safety_note %}
+          <div class="text-xs text-gray-500 mt-3">{{ treatment.safety_note }}</div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="text-sm text-gray-600 mt-2">
+        No treatment info received. (Check views.py is sending <code>treatment</code>.)
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="text-sm text-gray-600">No scan yet. Upload an image and click “Scan Disease”.</div>
+  {% endif %}
+</div>

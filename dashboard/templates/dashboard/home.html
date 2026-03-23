@@ -1,0 +1,19 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Farms</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {% for farm in farms %}
+    <a class="bg-white p-4 rounded shadow hover:shadow-md"
+       href="{% url 'farm_detail' farm.id %}">
+      <div class="font-semibold">{{ farm.name }}</div>
+      <div class="text-sm text-gray-600">{{ farm.location }}</div>
+      <div class="text-xs text-gray-500">Lat: {{ farm.latitude }} | Lon: {{ farm.longitude }}</div>
+    </a>
+  {% empty %}
+    <div class="bg-white p-4 rounded shadow">No farms created yet. Create one via /api/farms/</div>
+  {% endfor %}
+</div>
+
+{% endblock %}

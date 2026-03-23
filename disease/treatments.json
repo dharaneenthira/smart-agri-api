@@ -1,0 +1,51 @@
+{
+  "Tomato___Early_blight": {
+    "crop": "Tomato",
+    "disease": "Early Blight",
+    "symptoms": [
+      "Brown concentric rings on older leaves",
+      "Yellowing around spots"
+    ],
+    "immediate_actions": [
+      "Remove heavily infected leaves (do not compost).",
+      "Avoid overhead irrigation; water near the soil.",
+      "Improve airflow between plants."
+    ],
+    "chemical_options": [
+      {
+        "active_ingredient": "Mancozeb (protectant fungicide)",
+        "note": "Follow label directions and local agriculture advisory."
+      },
+      {
+        "active_ingredient": "Copper-based fungicide",
+        "note": "Rotate actives; follow label directions."
+      }
+    ],
+    "safety_note": "Prototype advisory—confirm with local KVK/agri officer and follow product label.",
+    "references": []
+  },
+  "Tomato___healthy": {
+    "crop": "Tomato",
+    "disease": "Healthy",
+    "symptoms": [],
+    "immediate_actions": [
+      "No disease signs detected. Continue monitoring."
+    ],
+    "chemical_options": [],
+    "safety_note": "If symptoms exist, retake photo or consult expert.",
+    "references": []
+  },
+  "Unknown": {
+    "crop": "",
+    "disease": "Unknown / Low Confidence",
+    "symptoms": [],
+    "immediate_actions": [
+      "Retake photo: single leaf, close-up, good lighting, plain background.",
+      "Upload 2–3 angles (front and back).",
+      "If symptoms persist, consult local agriculture officer."
+    ],
+    "chemical_options": [],
+    "safety_note": "No chemical advice given for unknown cases.",
+    "references": []
+  }
+}

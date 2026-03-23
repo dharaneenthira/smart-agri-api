@@ -1,0 +1,10 @@
+<div class="bg-white p-4 rounded shadow">
+  <div class="font-semibold mb-2">Weather</div>
+  {% if latest_weather %}
+    <div class="text-sm">Temp: <b>{{ latest_weather.temperature }}</b> °C</div>
+    <div class="text-sm">Humidity: <b>{{ latest_weather.humidity }}</b> %</div>
+    <div class="text-sm text-gray-600">{{ latest_weather.description }}</div>
+  {% else %}
+    <div class="text-sm text-gray-600">No weather data yet. Click “Fetch Weather”.</div>
+  {% endif %}
+</div>
